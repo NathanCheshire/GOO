@@ -2,39 +2,39 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public class Main {
     /** finds the maximum order possible of an element from the symmetric group S sub n
      * @author Nathan Cheshire
      * @since 3-10-21
      */
-    private static ArrayList<ArrayList<Integer>> cycles;
-    private static ArrayList<ArrayList<Integer>> starterCycles;
+    private static ArrayList<ArrayList<Integer>> openCycles;
+    private static ArrayList<ArrayList<Integer>> closedCycles;
 
     public static void main(String[] args) {
-        GOO(20); //420
+        //GOO(20); //420
         GOO(5); //6
         GOO(7); //12
-        GOO(13); //60
+        //GOO(13); //60
     }
 
     private static void GOO(int n) {
         int max = 0;
         ArrayList<Integer> using = new ArrayList<>();
-        starterCycles = new ArrayList<>();
-
-        ArrayList<Integer> productOfCycleLengths = new ArrayList<>(); //the product of the cycle lengths below
-        cycles = new ArrayList<>(); //cycles of which all add up to n
+        openCycles = new ArrayList<>();
+        closedCycles = new ArrayList<>();
+        ArrayList<Integer> productOfCycleLengths = new ArrayList<>();
 
         ArrayList<Integer> ones = new ArrayList<>();
         for (int i = 0 ; i < n ; i++) {
             ones.add(1);
         }
 
-        starterCycles.add(ones);
+        openCycles.add(ones);
         ArrayList<Integer> nList = new ArrayList<>();
         nList.add(n);
-        starterCycles.add(nList);
+        openCycles.add(nList);
 
         for (int i = n - 1 ; i > 0 ; i--) {
             ArrayList<Integer> cycle = new ArrayList<>();
@@ -44,21 +44,28 @@ public class Main {
                 cycle.add(1);
             }
 
-            if (!cycles.contains(cycle))
-                starterCycles.add(cycle);
+            if (!openCycles.contains(cycle))
+                openCycles.add(cycle);
         }
 
-        for (ArrayList<Integer> cycle : starterCycles)
-            cycleGenerator(cycle);
+        ArrayList<Integer> currentCycle;
 
-        for (ArrayList<Integer> cycle : cycles) {
+        while (!openCycles.isEmpty()) {
+            currentCycle = new ArrayList<>(openCycles.get(0));
+
+            closedCycles.add(currentCycle);
+            openCycles.remove(currentCycle);
+            cycleGenerator(currentCycle);
+        }
+
+        for (ArrayList<Integer> cycle : closedCycles) {
             productOfCycleLengths.add(lcmArray(cycle));
         }
 
         for (int i = 0 ; i < productOfCycleLengths.size() ;i++) {
             if (productOfCycleLengths.get(i) > max) {
                 max = productOfCycleLengths.get(i);
-                using = cycles.get(i);
+                using = closedCycles.get(i);
             }
         }
 
@@ -99,29 +106,20 @@ public class Main {
     }
 
     //cycle given is already in cycles so don't change
-    private static void cycleGenerator(ArrayList<Integer> cycle) {
-        if (cycle.size() < 3)
+    private static void cycleGenerator(ArrayList<Integer> cycle){
+        if (cycle.size() < 3) //len 2 right now so we don't do anything
             return;
 
-        int middleIndex = (int) Math.floor(cycle.size() / 2);
-        int middleValue = cycle.get(middleIndex);
+        int r1 = rand(0, cycle.size() - 1);
+        int r2 = rand(0, cycle.size() - 1);
 
-        if (middleIndex - 1 >= 0) {
-            int leftMidSum = middleValue + cycle.get(middleIndex - 1);
-            ArrayList<Integer> leftCopy = new ArrayList<>(cycle);
-            leftCopy.set(middleIndex,leftMidSum);
-            leftCopy.remove(middleIndex - 1);
-            cycles.add(leftCopy);
-            cycleGenerator(leftCopy);
-        }
+        while (r2 == r1)
+             r2 = rand(0, cycle.size() - 1);
 
-        if (middleIndex + 1 < cycle.size() - 1) {
-            int rightMidSum = middleValue + cycle.get(middleIndex + 1);
-            ArrayList<Integer> rightCopy = new ArrayList<>(cycle);
-            rightCopy.set(middleIndex,rightMidSum);
-            rightCopy.remove(middleIndex + 1);
-            cycles.add(rightCopy);
-            cycleGenerator(rightCopy);
-        }
+        ArrayList<Integer> r1r2Copy = new ArrayList<>(cycle);
+        int sum = r1r2Copy.get(r1) + r1r2Copy.get(r2);
+        r1r2Copy.set(r1, sum);
+        r1r2Copy.remove(r2);
+        openCycles.add(r1r2Copy); //if not in here
     }
 }
