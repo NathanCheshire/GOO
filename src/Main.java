@@ -1,5 +1,3 @@
-import java.lang.reflect.Array;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -10,28 +8,37 @@ public class Main {
      * @since 3-10-21
      */
     public static void main(String[] args) {
-        GOO(20); //should be 420 I believe
-        GOO(40); //no idea personally
+        //GOO(20); //should be 420 I believe
+        //GOO(40); //no idea personally
         GOO(7); //12
-        GOO(13); //60
+        //GOO(13); //60
     }
 
     private static void GOO(int n) {
         int max = 0;
-        ArrayList<Integer> using = null;
+        ArrayList<Integer> using = new ArrayList<>();
 
-        ArrayList<Integer> productOfCycleLengths = null; //the product of the cycle lengths below
-        ArrayList<ArrayList<Integer>> cycles = null; //cycles of which all add up to n
+        ArrayList<Integer> productOfCycleLengths = new ArrayList<>(); //the product of the cycle lengths below
+        ArrayList<ArrayList<Integer>> cycles = new ArrayList<>(); //cycles of which all add up to n
 
         long start = System.currentTimeMillis();
 
-        ArrayList<Integer> oneToNum = null;
-        for (int i = 1 ; i < n ; i++)
-            oneToNum.add(i);
+        ArrayList<Integer> ones = new ArrayList<>();
+        for (int i = 0 ; i < n ; i++) {
+            ones.add(1);
+        }
 
-        //fill cycles up now
+        cycles.add(ones);
+        System.out.println(stirlingCoefficient(n));
 
-        //
+        //how many times should you do the below tho?
+        //go until there are x cycles in cycles
+
+        //start in middle of a random list from cycles
+        //between 1 and n - 1 times:
+        // remove two random elements, add the two elements together, add the result back in
+        // if this arraylist is not in cycles (!arrl.equals(arr2))
+        //      add it in then
 
         for (ArrayList<Integer> cycle : cycles) {
             productOfCycleLengths.add(LCM(cycle));
@@ -54,18 +61,7 @@ public class Main {
             else
                 sb.append(using.get(i));
 
-        System.out.println("Results:\nmax order: " + max + "\nusing: [" + sb.toString() + "]");
-    }
-
-    boolean prime(int a) {
-        if (a <= 1)
-            return false;
-
-        for (int i = 2; i < a; i++)
-            if (a % i == 0)
-                return false;
-
-        return true;
+        System.out.println("max order of symmetric group S" + n + " is " + max + "\nusing: [" + sb.toString() + "]");
     }
 
     private static int[] convertIntegers(List<Integer> integers) {
@@ -107,5 +103,28 @@ public class Main {
             }
         }
         return lcm;
+    }
+
+    private static int stirlingCoefficient(int n) {
+        int max = 0;
+
+        for (int i = 0 ; i < n ; i++) {
+            int s = stirling(i,n);
+            if (s > max)
+                max = s;
+        }
+
+        return max;
+    }
+
+    private static int stirling(int s, int n) {
+        return (factorial(n))/(factorial(n - s) * factorial(s));
+    }
+
+    private static int factorial(int n) {
+        int fact = 1;
+        for (int i = 2; i <= n; i++)
+            fact = fact * i;
+        return fact;
     }
 }
