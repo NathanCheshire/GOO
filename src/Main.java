@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
 
 public class Main {
     /** finds the maximum order possible of an element from the symmetric group S sub n
@@ -8,9 +9,10 @@ public class Main {
      * @since 3-10-21
      */
     public static void main(String[] args) {
-        //GOO(20); //should be 420 I believe
-        //GOO(40); //no idea personally
-        GOO(7); //12
+        //GOO(20); //420
+        //GOO(40); //?
+        GOO(5);
+        //GOO(7); //12
         //GOO(13); //60
     }
 
@@ -29,10 +31,30 @@ public class Main {
         }
 
         cycles.add(ones);
-        System.out.println(stirlingCoefficient(n));
 
-        //how many times should you do the below tho?
-        //go until there are x cycles in cycles
+        while (cycles.size() < factorial(n)) {
+            System.out.println(cycles.size());
+            ArrayList<Integer> randNew = new ArrayList<>(cycles.get(rand(0, cycles.size() - 1)));
+
+            if (randNew.size() < 2)
+                continue;
+
+            int one = rand(0,randNew.size() - 1);
+            int two = rand(0,randNew.size() - 1);
+
+            while (one == two)
+                two = rand(0,randNew.size() - 1);
+
+            int addBackIn = randNew.get(one) + randNew.get(two);
+            randNew.remove(one);
+            randNew.remove(two);
+            randNew.add(addBackIn);
+
+            if (!cycles.contains(randNew)) {
+                cycles.add(randNew);
+                System.out.println("advanced");
+            }
+        }
 
         //start in middle of a random list from cycles
         //between 1 and n - 1 times:
@@ -105,26 +127,14 @@ public class Main {
         return lcm;
     }
 
-    private static int stirlingCoefficient(int n) {
-        int max = 0;
-
-        for (int i = 0 ; i < n ; i++) {
-            int s = stirling(i,n);
-            if (s > max)
-                max = s;
-        }
-
-        return max;
-    }
-
-    private static int stirling(int s, int n) {
-        return (factorial(n))/(factorial(n - s) * factorial(s));
-    }
-
     private static int factorial(int n) {
         int fact = 1;
         for (int i = 2; i <= n; i++)
             fact = fact * i;
         return fact;
+    }
+
+    private static int rand(int min, int max) {
+        return (int) ((Math.random() * (max - min)) + min);
     }
 }
