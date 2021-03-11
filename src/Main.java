@@ -29,12 +29,9 @@ public class Main {
         for (int i = 1 ; i < n ; i++)
             oneToNum.add(i);
 
-        //find all combos that add up to group size from this list that
-        // only have relatively prime numbers
-        //add these to correspondingSizes
+        //fill cycles up now
 
-        //soooo pseudocode:
-        //we go through all groups of size 1, then 2 then 3.... all the way to size n
+        //
 
         for (ArrayList<Integer> cycle : cycles) {
             productOfCycleLengths.add(LCM(cycle));
@@ -60,8 +57,15 @@ public class Main {
         System.out.println("Results:\nmax order: " + max + "\nusing: [" + sb.toString() + "]");
     }
 
-    boolean relativelyPrime(int a, int b) {
-        return BigInteger.valueOf(a).gcd(BigInteger.valueOf(b)).equals(BigInteger.ONE);
+    boolean prime(int a) {
+        if (a <= 1)
+            return false;
+
+        for (int i = 2; i < a; i++)
+            if (a % i == 0)
+                return false;
+
+        return true;
     }
 
     private static int[] convertIntegers(List<Integer> integers) {
