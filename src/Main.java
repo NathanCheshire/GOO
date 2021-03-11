@@ -11,12 +11,13 @@ public class Main {
     private static ArrayList<ArrayList<Integer>> cycles;
     private static int currentN;
     private static int secondsPerGOO = 2;
+    //how many seconds should the generate function run
+    private static int[] GOOS = {5,7,10,20};
+    //your goo values
 
     public static void main(String[] args) {
-        GOO(20); //420
-        GOO(5); //6
-        GOO(7); //12
-        GOO(13); //60
+        for (int GOO : GOOS)
+            GOO(GOO);
     }
 
     private static void GOO(int n) {
@@ -103,7 +104,6 @@ public class Main {
         return (int) ((Math.random() * (max)) + 0);
     }
 
-    //cycle given is already in cycles so don't change
     private static void cycleGenerator(ArrayList<Integer> cycle){
         if (cycle.size() < 3)
             return;
